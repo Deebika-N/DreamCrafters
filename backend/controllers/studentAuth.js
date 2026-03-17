@@ -1,3 +1,52 @@
+// ════════════════════════════════════════════════════════════════════════════
+// TODO: Rewrite this controller to use Prisma instead of Mongoose.
+//
+// Import the Prisma client like this:
+//   const prisma = require('../lib/prisma');
+//
+// The old Mongoose model (Student) has been removed.
+// Use `prisma.user` with `role: 'student'` for all queries.
+//
+// Key changes needed:
+//   - Student.findOne({ email })        → prisma.user.findFirst({ where: { email, role: 'student' } })
+//   - Student.findById(id)              → prisma.user.findUnique({ where: { id } })
+//   - Student.create({...})             → prisma.user.create({ data: {...} })
+//   - student.save()                    → prisma.user.update({ where: { id }, data: {...} })
+//   - student.comparePassword(pwd)      → bcrypt.compare(pwd, user.passwordHash)
+//   - Mongoose pre-save hook for hash   → bcrypt.hash(password, 12) before create/update
+//   - student._id                       → user.id
+//   - { $gt: Date.now() }              → { gt: new Date() }  (Prisma filter syntax)
+//
+// Password field mapping:
+//   - Old: `password` (Mongoose)
+//   - New: `passwordHash` (Prisma) → maps to `password_hash` column
+//
+// OTP field mapping:
+//   - Old: emailVerificationOTP      → New: emailVerificationOtp
+//   - Old: emailVerificationExpires   → New: emailVerificationExpires
+//   - Old: passwordResetOTP          → New: passwordResetOtp
+//   - Old: passwordResetExpires      → New: passwordResetExpires
+//
+// Setting a field to undefined (Mongoose) → set to null (Prisma)
+// ════════════════════════════════════════════════════════════════════════════
+
+// ── Placeholder stubs (remove these once you rewrite with Prisma) ──
+const notImplemented = (req, res) => {
+  res.status(501).json({ error: 'Not implemented yet — rewrite this controller to use Prisma' });
+};
+
+exports.requestStudentSignup = notImplemented;
+exports.verifyStudentOTP = notImplemented;
+exports.completeStudentSignup = notImplemented;
+exports.loginStudent = notImplemented;
+exports.getStudentProfile = notImplemented;
+exports.logoutStudent = notImplemented;
+exports.requestPasswordReset = notImplemented;
+exports.verifyPasswordResetOTP = notImplemented;
+exports.resetPassword = notImplemented;
+exports.changePassword = notImplemented;
+
+/*
 const jwt = require('jsonwebtoken');
 const Student = require('../models/Student');
 const { sendVerificationOTP, sendPasswordResetOTP } = require('../utils/email');
@@ -359,3 +408,4 @@ exports.changePassword = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+*/

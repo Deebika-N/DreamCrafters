@@ -1,3 +1,34 @@
+// ════════════════════════════════════════════════════════════════════════════
+// TODO: Rewrite this controller to use Prisma instead of Mongoose.
+//
+// Import the Prisma client like this:
+//   const prisma = require('../lib/prisma');
+//
+// The old Mongoose model (Admin) has been removed.
+// Use `prisma.user` with `role: 'admin'` for all queries.
+//
+// Key changes needed:
+//   - Admin.findOne({ username })       → prisma.user.findFirst({ where: { username, role: 'admin' } })
+//   - Admin.findById(id)               → prisma.user.findUnique({ where: { id } })
+//   - Admin.create({...})              → prisma.user.create({ data: {..., role: 'admin' } })
+//   - admin._id                        → user.id
+//   - Password hashing: use bcrypt.hash(password, 12) before create
+//
+// Password field mapping:
+//   - Old: `password` (Mongoose)
+//   - New: `passwordHash` (Prisma) → maps to `password_hash` column
+// ════════════════════════════════════════════════════════════════════════════
+
+// ── Placeholder stubs (remove these once you rewrite with Prisma) ──
+const notImplemented = (req, res) => {
+  res.status(501).json({ error: 'Not implemented yet — rewrite this controller to use Prisma' });
+};
+
+exports.loginAdmin = notImplemented;
+exports.getAdminProfile = notImplemented;
+exports.logoutAdmin = notImplemented;
+
+/*
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin');
 
@@ -87,3 +118,4 @@ exports.logoutAdmin = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+*/

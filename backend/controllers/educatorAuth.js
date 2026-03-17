@@ -1,3 +1,55 @@
+// ════════════════════════════════════════════════════════════════════════════
+// TODO: Rewrite this controller to use Prisma instead of Mongoose.
+//
+// Import the Prisma client like this:
+//   const prisma = require('../lib/prisma');
+//
+// The old Mongoose model (Educator) has been removed.
+// Use `prisma.user` with `role: 'mentor'` for all queries.
+//
+// NOTE: The old "educator" role is now "mentor" in the new schema.
+// NOTE: The old `organizationName` field is mapped to `name` in the new schema.
+//
+// Key changes needed:
+//   - Educator.findOne({ email })       → prisma.user.findFirst({ where: { email, role: 'mentor' } })
+//   - Educator.findById(id)             → prisma.user.findUnique({ where: { id } })
+//   - Educator.create({...})            → prisma.user.create({ data: {..., role: 'mentor' } })
+//   - educator.save()                   → prisma.user.update({ where: { id }, data: {...} })
+//   - educator.comparePassword(pwd)     → bcrypt.compare(pwd, user.passwordHash)
+//   - Mongoose pre-save hook for hash   → bcrypt.hash(password, 12) before create/update
+//   - educator._id                      → user.id
+//   - { $gt: Date.now() }              → { gt: new Date() }  (Prisma filter syntax)
+//
+// Password field mapping:
+//   - Old: `password` (Mongoose)
+//   - New: `passwordHash` (Prisma) → maps to `password_hash` column
+//
+// OTP field mapping:
+//   - Old: emailVerificationOTP      → New: emailVerificationOtp
+//   - Old: emailVerificationExpires   → New: emailVerificationExpires
+//   - Old: passwordResetOTP          → New: passwordResetOtp
+//   - Old: passwordResetExpires      → New: passwordResetExpires
+//
+// Setting a field to undefined (Mongoose) → set to null (Prisma)
+// ════════════════════════════════════════════════════════════════════════════
+
+// ── Placeholder stubs (remove these once you rewrite with Prisma) ──
+const notImplemented = (req, res) => {
+  res.status(501).json({ error: 'Not implemented yet — rewrite this controller to use Prisma' });
+};
+
+exports.requestEducatorSignup = notImplemented;
+exports.verifyEducatorOTP = notImplemented;
+exports.completeEducatorSignup = notImplemented;
+exports.loginEducator = notImplemented;
+exports.getEducatorProfile = notImplemented;
+exports.logoutEducator = notImplemented;
+exports.requestPasswordReset = notImplemented;
+exports.verifyPasswordResetOTP = notImplemented;
+exports.resetPassword = notImplemented;
+exports.changePassword = notImplemented;
+
+/*
 const jwt = require('jsonwebtoken');
 const Educator = require('../models/Educator');
 const { sendVerificationOTP, sendPasswordResetOTP } = require('../utils/email');
@@ -359,3 +411,4 @@ exports.changePassword = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+*/

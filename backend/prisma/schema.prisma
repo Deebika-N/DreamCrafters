@@ -1,0 +1,471 @@
+// ════════════════════════════════════════════
+// DREAM CRAFTERS — Prisma Schema (PostgreSQL)
+// ════════════════════════════════════════════
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── MODULE 1: AUTH & USER MANAGEMENT ────────
+
+model User {
+  id             Int      @id @default(autoincrement())
+  name           String   @db.VarChar(100)
+  email          String   @unique @db.VarChar(255)
+  passwordHash   String   @map("password_hash") @db.Text
+  role           String   @default("student") @db.VarChar(20) // student | mentor | admin
+  age            Int?
+  location       String?  @db.VarChar(100)
+  profilePicUrl  String?  @map("profile_pic_url") @db.Text
+  isVerified     Boolean  @default(false) @map("is_verified")
+  isActive       Boolean  @default(true) @map("is_active")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at")
+
+  // ── OTP fields (for email verification & password reset) ──
+  emailVerificationOtp     String?   @map("email_verification_otp") @db.VarChar(10)
+  emailVerificationExpires DateTime? @map("email_verification_expires")
+  passwordResetOtp         String?   @map("password_reset_otp") @db.VarChar(10)
+  passwordResetExpires     DateTime? @map("password_reset_expires")
+  username                 String?   @unique @db.VarChar(100)
+
+  // ── Relations ──
+  interests              UserInterest[]
+  learningPreference     UserLearningPreference?
+  refreshTokens          RefreshToken[]
+  createdContent         Content[]               @relation("ContentCreator")
+  bookmarks              Bookmark[]
+  contentProgress        UserContentProgress[]
+  hostedWebinars         Webinar[]
+  webinarRegistrations   WebinarRegistration[]
+  studyPlans             StudyPlan[]
+  personalizationProfile PersonalizationProfile?
+  aiRecommendations      AiRecommendation[]
+  chatSessions           ChatSession[]
+  mentorSessions         MentorSession[]         @relation("MentorSessions")
+  studentSessions        MentorSession[]         @relation("StudentSessions")
+  mentorFeedback         MentorFeedback[]
+  postedJobs             JobListing[]
+  jobApplications        JobApplication[]
+  contentFeedback        ContentFeedback[]
+  surveyResponses        SurveyResponse[]
+  platformEvents         PlatformEvent[]
+
+  @@map("users")
+}
+
+model UserInterest {
+  id       Int    @id @default(autoincrement())
+  userId   Int    @map("user_id")
+  interest String @db.VarChar(100)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_interests")
+}
+
+model UserLearningPreference {
+  id                   Int    @id @default(autoincrement())
+  userId               Int    @unique @map("user_id")
+  preferredLanguage    String @default("English") @map("preferred_language") @db.VarChar(50)
+  dailyStudyHours      Int    @default(2) @map("daily_study_hours")
+  learningStyle        String? @map("learning_style") @db.VarChar(50) // visual | reading | hands-on
+  difficultyPreference String @default("medium") @map("difficulty_preference") @db.VarChar(20)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_learning_preferences")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  token     String   @db.Text
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+// ─── MODULE 2: CONTENT, CAREER & VIDEO ────────
+
+model Category {
+  id          Int     @id @default(autoincrement())
+  name        String  @db.VarChar(100)
+  description String? @db.Text
+  parentId    Int?    @map("parent_id")
+
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  children Category[] @relation("CategoryHierarchy")
+  content  Content[]
+
+  @@map("categories")
+}
+
+model Content {
+  id                 Int      @id @default(autoincrement())
+  title              String   @db.VarChar(255)
+  description        String?  @db.Text
+  type               String   @db.VarChar(50) // video | article | quiz | ebook
+  url                String?  @db.Text
+  thumbnailUrl       String?  @map("thumbnail_url") @db.Text
+  categoryId         Int?     @map("category_id")
+  difficulty         String   @default("beginner") @db.VarChar(20) // beginner | intermediate | advanced
+  durationMinutes    Int?     @map("duration_minutes")
+  isOfflineAvailable Boolean  @default(false) @map("is_offline_available")
+  language           String   @default("English") @db.VarChar(50)
+  createdBy          Int?     @map("created_by")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  category        Category?            @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  creator         User?                @relation("ContentCreator", fields: [createdBy], references: [id], onDelete: SetNull)
+  careerPaths     CareerPathContent[]
+  bookmarks       Bookmark[]
+  userProgress    UserContentProgress[]
+  studySessions   StudySession[]
+  contentFeedback ContentFeedback[]
+
+  @@map("content")
+}
+
+model CareerPath {
+  id             Int      @id @default(autoincrement())
+  title          String   @db.VarChar(255)
+  description    String?  @db.Text
+  field          String?  @db.VarChar(100)
+  requiredSkills String[] @map("required_skills")
+  avgSalaryRange String?  @map("avg_salary_range") @db.VarChar(100)
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  content                 CareerPathContent[]
+  personalizationProfiles PersonalizationProfile[]
+
+  @@map("career_paths")
+}
+
+model CareerPathContent {
+  careerPathId Int @map("career_path_id")
+  contentId    Int @map("content_id")
+  orderIndex   Int? @map("order_index")
+
+  careerPath CareerPath @relation(fields: [careerPathId], references: [id], onDelete: Cascade)
+  content    Content    @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@id([careerPathId, contentId])
+  @@map("career_path_content")
+}
+
+model Bookmark {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  contentId Int      @map("content_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, contentId])
+  @@map("bookmarks")
+}
+
+model UserContentProgress {
+  id              Int       @id @default(autoincrement())
+  userId          Int       @map("user_id")
+  contentId       Int       @map("content_id")
+  status          String    @default("not_started") @db.VarChar(20) // not_started | in_progress | completed
+  progressPercent Int       @default(0) @map("progress_percent")
+  lastAccessedAt  DateTime? @map("last_accessed_at")
+  completedAt     DateTime? @map("completed_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, contentId])
+  @@map("user_content_progress")
+}
+
+model Webinar {
+  id              Int      @id @default(autoincrement())
+  title           String   @db.VarChar(255)
+  description     String?  @db.Text
+  hostId          Int?     @map("host_id")
+  scheduledAt     DateTime @map("scheduled_at")
+  durationMinutes Int?     @map("duration_minutes")
+  joinLink        String?  @map("join_link") @db.Text
+  topic           String?  @db.VarChar(100)
+  maxParticipants Int?     @map("max_participants")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  host          User?                 @relation(fields: [hostId], references: [id], onDelete: SetNull)
+  registrations WebinarRegistration[]
+
+  @@map("webinars")
+}
+
+model WebinarRegistration {
+  id           Int      @id @default(autoincrement())
+  webinarId    Int      @map("webinar_id")
+  userId       Int      @map("user_id")
+  registeredAt DateTime @default(now()) @map("registered_at")
+
+  webinar Webinar @relation(fields: [webinarId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([webinarId, userId])
+  @@map("webinar_registrations")
+}
+
+// ─── MODULE 3: AI STUDY PLANNER ───────────────
+
+model StudyPlan {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  title       String   @db.VarChar(255)
+  goal        String?  @db.Text
+  startDate   DateTime @map("start_date") @db.Date
+  endDate     DateTime? @map("end_date") @db.Date
+  status      String   @default("active") @db.VarChar(20) // active | paused | completed | archived
+  generatedBy String   @default("ai") @map("generated_by") @db.VarChar(20) // ai | user
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @default(now()) @updatedAt @map("updated_at")
+
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessions StudySession[]
+
+  @@map("study_plans")
+}
+
+model StudySession {
+  id              Int       @id @default(autoincrement())
+  planId          Int       @map("plan_id")
+  contentId       Int?      @map("content_id")
+  title           String    @db.VarChar(255)
+  scheduledDate   DateTime  @map("scheduled_date") @db.Date
+  scheduledTime   DateTime? @map("scheduled_time") @db.Time()
+  durationMinutes Int       @map("duration_minutes")
+  status          String    @default("pending") @db.VarChar(20) // pending | completed | missed | rescheduled
+  priority        Int       @default(2) // 1=low 2=medium 3=high
+  notes           String?   @db.Text
+  completedAt     DateTime? @map("completed_at")
+
+  plan        StudyPlan                @relation(fields: [planId], references: [id], onDelete: Cascade)
+  content     Content?                 @relation(fields: [contentId], references: [id], onDelete: SetNull)
+  reschedules StudySessionReschedule[]
+
+  @@map("study_sessions")
+}
+
+model StudySessionReschedule {
+  id            Int      @id @default(autoincrement())
+  sessionId     Int      @map("session_id")
+  oldDate       DateTime @map("old_date") @db.Date
+  newDate       DateTime @map("new_date") @db.Date
+  reason        String?  @db.VarChar(100) // missed | user_request | ai
+  rescheduledAt DateTime @default(now()) @map("rescheduled_at")
+
+  session StudySession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("study_session_reschedules")
+}
+
+model PersonalizationProfile {
+  id              Int       @id @default(autoincrement())
+  userId          Int       @unique @map("user_id")
+  recCareerPathId Int?      @map("rec_career_path_id")
+  strengths       String[]
+  areasToImprove  String[]  @map("areas_to_improve")
+  aiScores        Json?     @map("ai_scores") @db.JsonB
+  lastAssessedAt  DateTime? @map("last_assessed_at")
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  careerPath CareerPath? @relation(fields: [recCareerPathId], references: [id], onDelete: SetNull)
+
+  @@map("personalization_profiles")
+}
+
+model AiRecommendation {
+  id                 Int      @id @default(autoincrement())
+  userId             Int      @map("user_id")
+  type               String   @db.VarChar(50) // content | career | study_time | skill
+  recommendationData Json     @map("recommendation_data") @db.JsonB
+  isAccepted         Boolean? @map("is_accepted")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ai_recommendations")
+}
+
+// ─── MODULE 4: CHATBOT & GUIDANCE ENGINE ──────
+
+model ChatSession {
+  id          Int       @id @default(autoincrement())
+  userId      Int       @map("user_id")
+  sessionType String    @default("general") @map("session_type") @db.VarChar(50) // general | career | study | navigation
+  startedAt   DateTime  @default(now()) @map("started_at")
+  endedAt     DateTime? @map("ended_at")
+  context     Json?     @db.JsonB
+
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+
+  @@map("chat_sessions")
+}
+
+model ChatMessage {
+  id        Int      @id @default(autoincrement())
+  sessionId Int      @map("session_id")
+  role      String   @db.VarChar(20) // user | bot
+  message   String   @db.Text
+  metadata  Json?    @db.JsonB // intent, confidence, quick_replies
+  createdAt DateTime @default(now()) @map("created_at")
+
+  session ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@map("chat_messages")
+}
+
+model MentorSession {
+  id              Int       @id @default(autoincrement())
+  mentorId        Int       @map("mentor_id")
+  studentId       Int       @map("student_id")
+  status          String    @default("requested") @db.VarChar(20) // requested | accepted | rejected | completed | cancelled
+  scheduledAt     DateTime? @map("scheduled_at")
+  durationMinutes Int       @default(60) @map("duration_minutes")
+  topic           String?   @db.VarChar(255)
+  meetLink        String?   @map("meet_link") @db.Text
+  createdAt       DateTime  @default(now()) @map("created_at")
+
+  mentor   User             @relation("MentorSessions", fields: [mentorId], references: [id], onDelete: Cascade)
+  student  User             @relation("StudentSessions", fields: [studentId], references: [id], onDelete: Cascade)
+  feedback MentorFeedback[]
+
+  @@map("mentor_sessions")
+}
+
+model MentorFeedback {
+  id         Int      @id @default(autoincrement())
+  sessionId  Int      @map("session_id")
+  fromUserId Int      @map("from_user_id")
+  rating     Int? // CHECK 1-5
+  comment    String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  session  MentorSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  fromUser User          @relation(fields: [fromUserId], references: [id], onDelete: Cascade)
+
+  @@map("mentor_feedback")
+}
+
+// ─── MODULE 5: JOBS, FEEDBACK & ANALYTICS ─────
+
+model JobListing {
+  id                  Int       @id @default(autoincrement())
+  title               String    @db.VarChar(255)
+  company             String    @db.VarChar(255)
+  description         String?   @db.Text
+  location            String?   @db.VarChar(100)
+  jobType             String?   @map("job_type") @db.VarChar(50) // full-time | part-time | internship | freelance
+  requiredSkills      String[]  @map("required_skills")
+  salaryRange         String?   @map("salary_range") @db.VarChar(100)
+  applicationDeadline DateTime? @map("application_deadline") @db.Date
+  applyUrl            String?   @map("apply_url") @db.Text
+  postedBy            Int?      @map("posted_by")
+  isActive            Boolean   @default(true) @map("is_active")
+  createdAt           DateTime  @default(now()) @map("created_at")
+
+  poster       User?            @relation(fields: [postedBy], references: [id], onDelete: SetNull)
+  applications JobApplication[]
+
+  @@map("job_listings")
+}
+
+model JobApplication {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  jobId       Int      @map("job_id")
+  status      String   @default("applied") @db.VarChar(50) // applied | shortlisted | rejected | hired
+  resumeUrl   String?  @map("resume_url") @db.Text
+  coverLetter String?  @map("cover_letter") @db.Text
+  appliedAt   DateTime @default(now()) @map("applied_at")
+
+  user User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  JobListing @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, jobId])
+  @@map("job_applications")
+}
+
+model ContentFeedback {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  contentId Int      @map("content_id")
+  rating    Int? // CHECK 1-5
+  comment   String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  content Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
+
+  @@map("content_feedback")
+}
+
+model Survey {
+  id        Int       @id @default(autoincrement())
+  title     String    @db.VarChar(255)
+  description String? @db.Text
+  isActive  Boolean   @default(true) @map("is_active")
+  startDate DateTime? @map("start_date") @db.Date
+  endDate   DateTime? @map("end_date") @db.Date
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  questions SurveyQuestion[]
+
+  @@map("surveys")
+}
+
+model SurveyQuestion {
+  id         Int    @id @default(autoincrement())
+  surveyId   Int    @map("survey_id")
+  question   String @db.Text
+  type       String? @db.VarChar(50) // mcq | text | rating | checkbox
+  options    Json?  @db.JsonB
+  orderIndex Int?   @map("order_index")
+
+  survey    Survey           @relation(fields: [surveyId], references: [id], onDelete: Cascade)
+  responses SurveyResponse[]
+
+  @@map("survey_questions")
+}
+
+model SurveyResponse {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  questionId  Int      @map("question_id")
+  response    String?  @db.Text
+  submittedAt DateTime @default(now()) @map("submitted_at")
+
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  question SurveyQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@map("survey_responses")
+}
+
+model PlatformEvent {
+  id        BigInt   @id @default(autoincrement())
+  eventType String   @map("event_type") @db.VarChar(100)
+  userId    Int?     @map("user_id")
+  metadata  Json?    @db.JsonB
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("platform_events")
+}
