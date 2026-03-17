@@ -1,7 +1,5 @@
 const jwt = require('jsonwebtoken');
-const Student = require('../models/Student');
-const Educator = require('../models/Educator');
-const Admin = require('../models/Admin');
+const prisma = require('../lib/prisma');
 
 exports.protect = async (req, res, next) => {
   try {
@@ -20,15 +18,11 @@ exports.protect = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    // Find user based on role
-    let user;
-    if (decoded.role === 'student') {
-      user = await Student.findById(decoded.id).select('-password');
-    } else if (decoded.role === 'educator') {
-      user = await Educator.findById(decoded.id).select('-password');
-    } else if (decoded.role === 'admin') {
-      user = await Admin.findById(decoded.id).select('-password');
-    }
+    // Find user from the unified users table (no need to check role-specific models)
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.id },
+      omit: { passwordHash: true },
+    });
 
     if (!user) {
       return res.status(401).json({ error: 'User not found' });
