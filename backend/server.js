@@ -1,5 +1,4 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
@@ -23,14 +22,8 @@ app.use('/api/admin/auth', adminAuthRouter);
 app.get('/api/hello', (req, res) => res.json({ message: 'Hello from backend' }));
 
 const PORT = process.env.PORT || 5000;
-const MONGO = process.env.MONGO_URI || 'mongodb://localhost:27017/mern_demo';
 
-mongoose
-  .connect(MONGO)
-  .then(() => {
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-  })
-  .catch((err) => {
-    console.error('DB connection error', err);
-    process.exit(1);
-  });
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log('Database: PostgreSQL via Prisma');
+});
