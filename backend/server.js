@@ -11,6 +11,8 @@ const studyPlannerRouter = require('./routes/studyPlanner');
 const contentRoutes = require('./routes/content');
 const careerPathRoutes = require('./routes/careerPaths');
 const webinarRoutes = require('./routes/webinars');
+const chatRoutes = require('./routes/chat');
+const ragRoutes = require('./routes/rag');
 
 const app = express();
 app.use(cors({
@@ -27,6 +29,8 @@ app.use('/api', studyPlannerRouter);
 app.use('/api', contentRoutes);
 app.use('/api', careerPathRoutes);
 app.use('/api', webinarRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/rag', ragRoutes);
 
 app.get('/api/hello', (req, res) => res.json({ message: 'Hello from backend' }));
 

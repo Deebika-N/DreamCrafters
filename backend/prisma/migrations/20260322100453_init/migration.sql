@@ -1,3 +1,6 @@
+-- CreateExtension
+CREATE EXTENSION IF NOT EXISTS "vector";
+
 -- CreateTable
 CREATE TABLE "users" (
     "id" SERIAL NOT NULL,
@@ -248,6 +251,43 @@ CREATE TABLE "chat_messages" (
 );
 
 -- CreateTable
+CREATE TABLE "rag_documents" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "session_id" INTEGER,
+    "filename" VARCHAR(255) NOT NULL,
+    "original_name" VARCHAR(255) NOT NULL,
+    "mime_type" VARCHAR(100) NOT NULL,
+    "size_bytes" INTEGER NOT NULL,
+    "file_path" TEXT NOT NULL,
+    "status" VARCHAR(20) NOT NULL DEFAULT 'processing',
+    "total_chunks" INTEGER,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "rag_documents_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "rag_chunks" (
+    "id" SERIAL NOT NULL,
+    "document_id" INTEGER NOT NULL,
+    "chunk_index" INTEGER NOT NULL,
+    "content" TEXT NOT NULL,
+    "embedding" vector(768),
+    "metadata" JSONB,
+
+    CONSTRAINT "rag_chunks_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "chat_session_documents" (
+    "session_id" INTEGER NOT NULL,
+    "document_id" INTEGER NOT NULL,
+
+    CONSTRAINT "chat_session_documents_pkey" PRIMARY KEY ("session_id","document_id")
+);
+
+-- CreateTable
 CREATE TABLE "mentor_sessions" (
     "id" SERIAL NOT NULL,
     "mentor_id" INTEGER NOT NULL,
@@ -460,6 +500,21 @@ ALTER TABLE "chat_sessions" ADD CONSTRAINT "chat_sessions_user_id_fkey" FOREIGN 
 
 -- AddForeignKey
 ALTER TABLE "chat_messages" ADD CONSTRAINT "chat_messages_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "chat_sessions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "rag_documents" ADD CONSTRAINT "rag_documents_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "rag_documents" ADD CONSTRAINT "rag_documents_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "chat_sessions"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "rag_chunks" ADD CONSTRAINT "rag_chunks_document_id_fkey" FOREIGN KEY ("document_id") REFERENCES "rag_documents"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "chat_session_documents" ADD CONSTRAINT "chat_session_documents_session_id_fkey" FOREIGN KEY ("session_id") REFERENCES "chat_sessions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "chat_session_documents" ADD CONSTRAINT "chat_session_documents_document_id_fkey" FOREIGN KEY ("document_id") REFERENCES "rag_documents"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "mentor_sessions" ADD CONSTRAINT "mentor_sessions_mentor_id_fkey" FOREIGN KEY ("mentor_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
