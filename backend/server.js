@@ -23,10 +23,15 @@ app.use(cookieParser());
 app.use('/api/student/auth', studentAuthRouter);
 app.use('/api/educator/auth', educatorAuthRouter);
 app.use('/api/admin/auth', adminAuthRouter);
-app.use('/api', studyPlannerRouter);
+
+// Important: New routers must be mounted BEFORE studyPlannerRouter
+// because studyPlannerRouter contains a global router.use(protect)
+// that will cause 401s on public M2 endpoints if mounted first.
 app.use('/api', contentRoutes);
 app.use('/api', careerPathRoutes);
 app.use('/api', webinarRoutes);
+
+app.use('/api', studyPlannerRouter);
 
 app.get('/api/hello', (req, res) => res.json({ message: 'Hello from backend' }));
 

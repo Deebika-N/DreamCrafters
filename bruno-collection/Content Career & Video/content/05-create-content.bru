@@ -28,3 +28,10 @@ body:json {
     "language": "English"
   }
 }
+
+script:post-response {
+  if (res.status === 201) {
+    bru.setEnvVar("contentId", res.body.data.id);
+  }
+}
+

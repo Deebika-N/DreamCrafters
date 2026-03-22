@@ -96,8 +96,23 @@ exports.getRecommended = async (req, res) => {
     if (completedIds.length) {
       where.id = { notIn: completedIds };
     }
+
+    // Map preference values to content difficulty values
+    // DB default is "medium" but content uses beginner/intermediate/advanced
     if (learningPref && learningPref.difficultyPreference) {
-      where.difficulty = learningPref.difficultyPreference;
+      const difficultyMap = {
+        easy: 'beginner',
+        medium: 'intermediate',
+        hard: 'advanced',
+        // Also allow direct values in case they're already aligned
+        beginner: 'beginner',
+        intermediate: 'intermediate',
+        advanced: 'advanced',
+      };
+      const mappedDifficulty = difficultyMap[learningPref.difficultyPreference.toLowerCase()];
+      if (mappedDifficulty) {
+        where.difficulty = mappedDifficulty;
+      }
     }
 
     const recommended = await prisma.content.findMany({
