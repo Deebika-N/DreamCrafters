@@ -7,6 +7,7 @@ export default function SpotlightCard({
   spotlightColor = 'rgba(102, 126, 234, 0.15)',
   spotlightSize = 300,
   style = {},
+  ...props
 }) {
   const cardRef = useRef(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
@@ -30,6 +31,7 @@ export default function SpotlightCard({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={style}
+      {...props}
     >
       <div
         className="spotlight-effect"

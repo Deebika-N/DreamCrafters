@@ -8,6 +8,7 @@ export default function TiltCard({
   scale = 1.02,
   perspective = 1000,
   style = {},
+  ...props
 }) {
   const cardRef = useRef(null);
   const [transform, setTransform] = useState('');
@@ -38,6 +39,7 @@ export default function TiltCard({
       style={{ transform, ...style }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      {...props}
     >
       {children}
     </div>
