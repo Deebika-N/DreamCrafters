@@ -1,11 +1,34 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { 
+  Video, 
+  FileText, 
+  HelpCircle, 
+  Book, 
+  Library, 
+  Sparkles, 
+  Bookmark, 
+  Search, 
+  Leaf, 
+  Zap, 
+  Rocket, 
+  AlertCircle, 
+  Inbox, 
+  FilePlus, 
+  Clock, 
+  CheckCircle 
+} from 'lucide-react'
 import { contentAPI } from '../../api'
 import DashboardLayout from '../../components/DashboardLayout'
 import SpotlightCard from '../../components/reactbits/SpotlightCard'
 import AnimatedContent from '../../components/reactbits/AnimatedContent'
 
-const TYPE_ICONS = { video: '🎬', article: '📄', quiz: '❓', ebook: '📖' }
+const TYPE_ICONS = { 
+  video: <Video size={32} />, 
+  article: <FileText size={32} />, 
+  quiz: <HelpCircle size={32} />, 
+  ebook: <Book size={32} /> 
+}
 const DIFF_COLORS = { beginner: 'badge-success', intermediate: 'badge-warning', advanced: 'badge-danger' }
 
 export default function ContentLibrary() {
@@ -67,13 +90,26 @@ export default function ContentLibrary() {
   return (
     <DashboardLayout title="Content Library">
       <div className="page-header">
-        <h1>Content Library 📚</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          Content Library
+          <Library size={28} color="var(--primary)" />
+        </h1>
         <p>Explore videos, articles, eBooks and quizzes to boost your learning</p>
       </div>
 
       <div className="tabs">
-        {[{ key: 'all', label: '📚 All Content' }, { key: 'recommended', label: '✨ Recommended' }, { key: 'bookmarks', label: '🔖 Bookmarks' }].map(tab => (
-          <button key={tab.key} className={`tab${view === tab.key ? ' active' : ''}`} onClick={() => setView(tab.key)}>
+        {[
+          { key: 'all', label: 'All Content', icon: <Library size={16} /> }, 
+          { key: 'recommended', label: 'Recommended', icon: <Sparkles size={16} /> }, 
+          { key: 'bookmarks', label: 'Bookmarks', icon: <Bookmark size={16} /> }
+        ].map(tab => (
+          <button 
+            key={tab.key} 
+            className={`tab${view === tab.key ? ' active' : ''}`} 
+            onClick={() => setView(tab.key)}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            {tab.icon}
             {tab.label}
           </button>
         ))}
@@ -82,20 +118,31 @@ export default function ContentLibrary() {
       {view === 'all' && (
         <div className="card" style={{ marginBottom: '2rem' }}>
           <form onSubmit={handleSearch} style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            <input className="form-input" placeholder="🔍 Search content..." value={search}
-              onChange={e => setSearch(e.target.value)} style={{ flex: 2, minWidth: '200px' }} />
+            <div style={{ flex: 2, minWidth: '200px', position: 'relative' }}>
+              <Search 
+                size={18} 
+                style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} 
+              />
+              <input 
+                className="form-input" 
+                placeholder="Search content..." 
+                value={search}
+                onChange={e => setSearch(e.target.value)} 
+                style={{ paddingLeft: '40px', width: '100%' }} 
+              />
+            </div>
             <select className="form-select" value={typeFilter} onChange={e => setTypeFilter(e.target.value)} style={{ minWidth: '140px' }}>
               <option value="">All Types</option>
-              <option value="video">🎬 Video</option>
-              <option value="article">📄 Article</option>
-              <option value="ebook">📖 eBook</option>
-              <option value="quiz">❓ Quiz</option>
+              <option value="video">Video</option>
+              <option value="article">Article</option>
+              <option value="ebook">eBook</option>
+              <option value="quiz">Quiz</option>
             </select>
             <select className="form-select" value={diffFilter} onChange={e => setDiffFilter(e.target.value)} style={{ minWidth: '140px' }}>
               <option value="">All Levels</option>
-              <option value="beginner">🌱 Beginner</option>
-              <option value="intermediate">⚡ Intermediate</option>
-              <option value="advanced">🚀 Advanced</option>
+              <option value="beginner">Beginner</option>
+              <option value="intermediate">Intermediate</option>
+              <option value="advanced">Advanced</option>
             </select>
             <button type="submit" className="btn btn-primary">Search</button>
           </form>
@@ -104,11 +151,15 @@ export default function ContentLibrary() {
 
       {loading && <div className="empty-state"><div className="loading-spinner" style={{ margin: '0 auto' }} /></div>}
 
-      {error && !loading && <div className="alert alert-error" style={{ marginBottom: '1.5rem' }}>❌ {error}</div>}
+      {error && !loading && (
+        <div className="alert alert-error" style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <AlertCircle size={18} /> {error}
+        </div>
+      )}
 
       {!loading && !error && filtered.length === 0 && (
         <div className="empty-state">
-          <span className="icon">📭</span>
+          <Inbox size={48} color="var(--text-muted)" style={{ marginBottom: '1rem' }} />
           <h3>No content found</h3>
           <p>{view === 'bookmarks' ? 'You haven\'t bookmarked any content yet.' : view === 'recommended' ? 'No recommendations available.' : 'Try adjusting your search or filters.'}</p>
           {view !== 'all' && <button className="btn btn-primary" style={{ marginTop: '1rem' }} onClick={() => setView('all')}>Browse All Content</button>}
@@ -127,14 +178,21 @@ export default function ContentLibrary() {
                   <button onClick={(e) => { e.stopPropagation(); handleBookmark(c.id, c.isBookmarked) }}
                     className="btn-ghost" style={{ position: 'absolute', top: '0.75rem', right: '0.75rem', fontSize: '1.2rem', zIndex: 5, background: 'rgba(255,255,255,0.9)', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid var(--border)' }}
                     title={c.isBookmarked ? 'Remove bookmark' : 'Bookmark'}>
-                    {c.isBookmarked ? '🔖' : '📑'}
+                    {c.isBookmarked ? <Bookmark size={18} fill="var(--primary)" /> : <FilePlus size={18} />}
                   </button>
-                  <div style={{ width: '100%', height: '120px', borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.15))', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem', marginBottom: '1rem' }}>
-                    {TYPE_ICONS[c.type] || '📄'}
+                  <div style={{ width: '100%', height: '120px', borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, rgba(102,126,234,0.1), rgba(118,75,162,0.15))', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem', color: 'var(--primary)' }}>
+                    {TYPE_ICONS[c.type] || <FileText size={32} />}
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <span className={`badge ${DIFF_COLORS[c.difficulty] || 'badge-info'}`}>{c.difficulty || 'N/A'}</span>
-                    {c.duration_minutes && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>⏱️ {c.duration_minutes} min</span>}
+                    <span className={`badge ${DIFF_COLORS[c.difficulty] || 'badge-info'}`} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      {c.difficulty === 'beginner' && <Leaf size={12} />}
+                      {c.difficulty === 'intermediate' && <Zap size={12} />}
+                      {c.difficulty === 'advanced' && <Rocket size={12} />}
+                      {c.difficulty || 'N/A'}
+                    </span>
+                    {c.duration_minutes && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <Clock size={12} /> {c.duration_minutes} min
+                    </span>}
                   </div>
                   <h3 style={{ fontWeight: 700, fontSize: '1rem', margin: '0 0 0.5rem', lineHeight: 1.4, minHeight: '2.8rem' }}>{c.title}</h3>
                   {c.description && <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5, marginBottom: '0.75rem', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>{c.description}</p>}
@@ -148,8 +206,8 @@ export default function ContentLibrary() {
                       <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>{c.userProgress.progress_percent}% complete</p>
                     </div>
                   )}
-                  <button className="btn btn-primary btn-full btn-sm" onClick={() => c.url && window.open(c.url, '_blank')}>
-                    {c.userProgress?.status === 'completed' ? '✓ Completed' : 'Start Learning'}
+                  <button className="btn btn-primary btn-full btn-sm" onClick={() => c.url && window.open(c.url, '_blank')} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                    {c.userProgress?.status === 'completed' ? <><CheckCircle size={14} /> Completed</> : 'Start Learning'}
                   </button>
                 </SpotlightCard>
               </AnimatedContent>

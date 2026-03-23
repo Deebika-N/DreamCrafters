@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
+import { 
+  Target, 
+  Search, 
+  AlertCircle, 
+  DollarSign, 
+  ArrowRight, 
+  X 
+} from 'lucide-react'
 import { careerAPI } from '../../api'
 import DashboardLayout from '../../components/DashboardLayout'
 import SpotlightCard from '../../components/reactbits/SpotlightCard'
@@ -47,20 +55,40 @@ export default function CareerPaths() {
   return (
     <DashboardLayout title="Career Paths">
       <div className="page-header">
-        <h1>Career Paths 🎯</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          Career Paths
+          <Target size={28} color="var(--primary)" />
+        </h1>
         <p>Explore curated career roadmaps with step-by-step guidance</p>
       </div>
 
-      <div style={{ marginBottom: '1.5rem' }}>
-        <input className="form-input" placeholder="🔍 Search career paths..." value={search}
-          onChange={e => setSearch(e.target.value)} style={{ maxWidth: '400px' }} />
+      <div style={{ marginBottom: '1.5rem', position: 'relative', maxWidth: '400px' }}>
+        <Search 
+          size={18} 
+          style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} 
+        />
+        <input 
+          className="form-input" 
+          placeholder="Search career paths..." 
+          value={search}
+          onChange={e => setSearch(e.target.value)} 
+          style={{ paddingLeft: '40px' }} 
+        />
       </div>
 
       {loading && <div className="empty-state"><div className="loading-spinner" style={{ margin: '0 auto' }} /></div>}
-      {error && !loading && <div className="alert alert-error">❌ {error}</div>}
+      {error && !loading && (
+        <div className="alert alert-error" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <AlertCircle size={18} /> {error}
+        </div>
+      )}
 
       {!loading && !error && filtered.length === 0 && (
-        <div className="empty-state"><span className="icon">🎯</span><h3>No career paths found</h3><p>Career paths will appear here once added.</p></div>
+        <div className="empty-state">
+          <Target size={48} color="var(--text-muted)" style={{ marginBottom: '1rem' }} />
+          <h3>No career paths found</h3>
+          <p>Career paths will appear here once added.</p>
+        </div>
       )}
 
       {selectedPath && (
@@ -68,7 +96,9 @@ export default function CareerPaths() {
           <div className="modal" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
               <h2 className="modal-title">{selectedPath.title}</h2>
-              <button className="modal-close" onClick={() => setSelectedPath(null)}>×</button>
+              <button className="modal-close" onClick={() => setSelectedPath(null)}>
+                <X size={20} />
+              </button>
             </div>
             {selectedPath.description && <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>{selectedPath.description}</p>}
             {selectedPath.field && <span className="badge badge-primary" style={{ marginBottom: '1rem', display: 'inline-block' }}>{selectedPath.field}</span>}
@@ -80,14 +110,18 @@ export default function CareerPaths() {
                 </div>
               </div>
             )}
-            {selectedPath.avg_salary_range && <p style={{ fontWeight: 700, color: 'var(--success)' }}>💰 Avg Salary: {selectedPath.avg_salary_range}</p>}
+            {selectedPath.avg_salary_range && (
+              <p style={{ fontWeight: 700, color: 'var(--success)', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <DollarSign size={16} /> Avg Salary: {selectedPath.avg_salary_range}
+              </p>
+            )}
             {selectedPath.content && selectedPath.content.length > 0 && (
               <div style={{ marginTop: '1rem' }}>
                 <div style={{ fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.5rem' }}>Linked Content ({selectedPath.content.length}):</div>
                 {selectedPath.content.map((c, i) => (
                   <div key={i} className="card" style={{ padding: '0.75rem', marginBottom: '0.5rem' }}>
                     <strong style={{ fontSize: '0.9rem' }}>{c.title}</strong>
-                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{c.type} • {c.difficulty}</div>
+                    <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{c.type} - {c.difficulty}</div>
                   </div>
                 ))}
               </div>
@@ -115,8 +149,14 @@ export default function CareerPaths() {
                   </div>
                 )}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  {cp.avg_salary_range && <span style={{ fontWeight: 700, color: 'var(--success)', fontSize: '0.9rem' }}>💰 {cp.avg_salary_range}</span>}
-                  <button className="btn btn-sm btn-primary" onClick={e => { e.stopPropagation(); fetchPathDetail(cp.id) }}>View Details →</button>
+                  {cp.avg_salary_range && (
+                    <span style={{ fontWeight: 700, color: 'var(--success)', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <DollarSign size={14} /> {cp.avg_salary_range}
+                    </span>
+                  )}
+                  <button className="btn btn-sm btn-primary" onClick={e => { e.stopPropagation(); fetchPathDetail(cp.id) }} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    View Details <ArrowRight size={14} />
+                  </button>
                 </div>
               </SpotlightCard>
             </AnimatedContent>

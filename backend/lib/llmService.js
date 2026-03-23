@@ -18,10 +18,12 @@ Always respond in the same language the student uses.`;
   // RAG Context (Grounding)
   if (ragContext && ragContext.length > 0) {
     prompt += `\n\n## Documents Context
-You have access to the following information from the student's uploaded documents. 
-When answering, specifically refer to this information if relevant. 
-If the answer is found in the documents, mention the source document name.
-If you don't know the answer from the documents, you can use your general knowledge but clarify it's not from the provided materials.
+You have been provided with specific excerpts from the student's personal documents below. 
+You MUST prioritize this information when answering. 
+- Specifically refer to these excerpts if relevant. 
+- Mention the source document name (e.g., "[Source: Document.pdf]").
+- If the student asks about document content, use these excerpts as your primary source of truth.
+- Do NOT say you don't have access to files; you HAVE been provided with the relevant parts of those files below.
 
 ### Extracted Relevant Chunks:
 ${ragContext.map((c, i) => `[Source: ${c.documentName}] ${c.content}`).join('\n\n')}`;
@@ -201,16 +203,20 @@ async function generateChatResponse({ userMessage, userId, sessionType, sessionC
       console.log(`[RAG] Generating query embedding for: "${userMessage.substring(0, 50)}..."`);
       const queryEmbedding = await generateQueryEmbedding(userMessage);
 
-      console.log(`[RAG] Searching across ${documentIds.length} documents...`);
+      console.log(`[RAG] Searching across ${documentIds.length} documents: ${documentIds.join(', ')}...`);
       retrievedChunks = await searchChunks(documentIds, queryEmbedding, 5);
       
+      console.log(`[RAG] Found ${retrievedChunks.length} relevant chunks`);
+      if (retrievedChunks.length > 0) {
+        console.log(`[RAG] Top chunk similarity: ${retrievedChunks[0].similarity}`);
+        console.log(`[RAG] Top chunk content (preview): ${retrievedChunks[0].content.substring(0, 100)}...`);
+      }
+
       sources = retrievedChunks.map(c => ({
         documentId: c.documentId,
         documentName: c.documentName,
         similarity: c.similarity
       })).filter((v, i, a) => a.findIndex(t => t.documentId === v.documentId) === i); // dedupe by doc
-      
-      console.log(`[RAG] Found ${retrievedChunks.length} relevant chunks`);
     } catch (err) {
       console.error('[RAG] Retrieval failed:', err.message);
       // Continue without RAG context if retrieval fails

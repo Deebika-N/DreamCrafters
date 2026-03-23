@@ -1,7 +1,5 @@
-import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { useAuth } from '../../context/AuthContext'
+import { GraduationCap, UserCheck, ArrowLeft } from 'lucide-react'
 import { studentAuthAPI, educatorAuthAPI } from '../../api'
 import Particles from '../../components/reactbits/Particles'
 
@@ -52,13 +50,19 @@ export default function Login() {
             className={`btn btn-full ${role === 'student' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setRole('student')}
             whileTap={{ scale: 0.97 }}
-          >🎓 Student</motion.button>
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+          >
+            <GraduationCap size={18} /> Student
+          </motion.button>
           <motion.button
             type="button"
             className={`btn btn-full ${role === 'educator' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setRole('educator')}
             whileTap={{ scale: 0.97 }}
-          >👨‍🏫 Educator</motion.button>
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+          >
+            <UserCheck size={18} /> Educator
+          </motion.button>
         </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
@@ -125,7 +129,9 @@ export default function Login() {
           Don't have an account? <Link to="/register">Create one</Link>
         </div>
         <div className="auth-footer" style={{ marginTop: '0.75rem' }}>
-          <Link to="/">← Back to Home</Link>
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+            <ArrowLeft size={16} /> Back to Home
+          </Link>
         </div>
       </motion.div>
     </div>

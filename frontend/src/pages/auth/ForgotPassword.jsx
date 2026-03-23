@@ -1,6 +1,4 @@
-import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { GraduationCap, UserCheck, ArrowLeft } from 'lucide-react'
 import { studentAuthAPI, educatorAuthAPI } from '../../api'
 import Particles from '../../components/reactbits/Particles'
 
@@ -70,9 +68,15 @@ export default function ForgotPassword() {
         {step < 4 && (
           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
             <button type="button" className={`btn btn-full ${role === 'student' ? 'btn-primary' : 'btn-secondary'}`}
-              onClick={() => { setRole('student'); setStep(1); setError(''); setMessage('') }}>🎓 Student</button>
+              onClick={() => { setRole('student'); setStep(1); setError(''); setMessage('') }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+              <GraduationCap size={18} /> Student
+            </button>
             <button type="button" className={`btn btn-full ${role === 'educator' ? 'btn-primary' : 'btn-secondary'}`}
-              onClick={() => { setRole('educator'); setStep(1); setError(''); setMessage('') }}>👨‍🏫 Educator</button>
+              onClick={() => { setRole('educator'); setStep(1); setError(''); setMessage('') }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+              <UserCheck size={18} /> Educator
+            </button>
           </div>
         )}
 
@@ -123,7 +127,9 @@ export default function ForgotPassword() {
         )}
 
         <div className="auth-footer">
-          <Link to="/login">← Back to Login</Link>
+          <Link to="/login" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+            <ArrowLeft size={16} /> Back to Login
+          </Link>
         </div>
       </motion.div>
     </div>

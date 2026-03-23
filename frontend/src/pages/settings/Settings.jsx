@@ -1,6 +1,5 @@
-import React, { useState } from 'react'
-import { motion } from 'framer-motion'
 import { useAuth } from '../../context/AuthContext'
+import { User, Lock } from 'lucide-react'
 import { studentAuthAPI, educatorAuthAPI } from '../../api'
 import DashboardLayout from '../../components/DashboardLayout'
 import AnimatedContent from '../../components/reactbits/AnimatedContent'
@@ -52,7 +51,9 @@ export default function Settings() {
       {msg.text && <div className={`alert alert-${msg.type}`} style={{ marginBottom: '1.5rem' }}>{msg.text}</div>}
 
       <div className="card" style={{ marginBottom: '2rem' }}>
-        <div className="card-title" style={{ marginBottom: '1rem' }}>👤 Profile Information</div>
+        <div className="card-title" style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <User size={20} color="var(--primary)" /> Profile Information
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
           <div><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Name</span><br /><strong>{user?.name}</strong></div>
           <div><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Username</span><br /><strong>{user?.username}</strong></div>
@@ -62,7 +63,9 @@ export default function Settings() {
       </div>
 
       <div className="card">
-        <div className="card-title" style={{ marginBottom: '1rem' }}>🔒 Change Password</div>
+        <div className="card-title" style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Lock size={20} color="var(--primary)" /> Change Password
+        </div>
         <form onSubmit={changePassword} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', maxWidth: '500px' }}>
           <div className="form-group">
             <label className="form-label">Current Password</label>

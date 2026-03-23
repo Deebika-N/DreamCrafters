@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { 
+  Calendar, 
+  Library, 
+  Target, 
+  Briefcase, 
+  MessageSquare, 
+  Users, 
+  User as UserIcon 
+} from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 import { studentAuthAPI, educatorAuthAPI } from '../../api'
 import DashboardLayout from '../../components/DashboardLayout'
@@ -28,19 +37,19 @@ export default function Dashboard() {
   }
 
   const stats = [
-    { icon: '📅', label: 'Study Plans', value: 3, color: 'purple', link: '/study-planner' },
-    { icon: '📚', label: 'Content', value: 24, color: 'blue', link: '/content' },
-    { icon: '🎯', label: 'Career Paths', value: 5, color: 'green', link: '/careers' },
-    { icon: '💼', label: 'Jobs', value: 6, color: 'orange', link: '/jobs' },
+    { icon: <Calendar size={20} />, label: 'Study Plans', value: 3, color: 'purple', link: '/study-planner' },
+    { icon: <Library size={20} />, label: 'Content', value: 24, color: 'blue', link: '/content' },
+    { icon: <Target size={20} />, label: 'Career Paths', value: 5, color: 'green', link: '/careers' },
+    { icon: <Briefcase size={20} />, label: 'Jobs', value: 6, color: 'orange', link: '/jobs' },
   ]
 
   const quickActions = [
-    { icon: '📅', label: 'Create Study Plan', desc: 'Generate an AI-powered plan', path: '/study-planner' },
-    { icon: '📚', label: 'Browse Content', desc: 'Explore videos & articles', path: '/content' },
-    { icon: '💬', label: 'Chat with AI', desc: 'Get instant guidance', path: '/chat' },
-    { icon: '👨‍🏫', label: 'Find a Mentor', desc: 'Connect with experts', path: '/mentors' },
-    { icon: '💼', label: 'Browse Jobs', desc: 'Find opportunities', path: '/jobs' },
-    { icon: '🎯', label: 'Career Paths', desc: 'Explore career roadmaps', path: '/careers' },
+    { icon: <Calendar size={24} />, label: 'Create Study Plan', desc: 'Generate an AI-powered plan', path: '/study-planner' },
+    { icon: <Library size={24} />, label: 'Browse Content', desc: 'Explore videos & articles', path: '/content' },
+    { icon: <MessageSquare size={24} />, label: 'Chat with AI', desc: 'Get instant guidance', path: '/chat' },
+    { icon: <Users size={24} />, label: 'Find a Mentor', desc: 'Connect with experts', path: '/mentors' },
+    { icon: <Briefcase size={24} />, label: 'Browse Jobs', desc: 'Find opportunities', path: '/jobs' },
+    { icon: <Target size={24} />, label: 'Career Paths', desc: 'Explore career roadmaps', path: '/careers' },
   ]
 
   return (
@@ -51,7 +60,7 @@ export default function Dashboard() {
         transition={{ duration: 0.5 }}
       >
         <div className="page-header">
-          <h1>Welcome back, {user?.name?.split(' ')[0]}! 👋</h1>
+          <h1>Welcome back, {user?.name?.split(' ')[0]}!</h1>
           <p>Here's your learning overview</p>
         </div>
 
@@ -83,7 +92,7 @@ export default function Dashboard() {
                 <TiltCard maxTilt={5} scale={1.01}>
                   <div className="card" onClick={() => navigate(a.path)}
                     style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                    <div style={{ fontSize: '2rem' }}>{a.icon}</div>
+                    <div style={{ color: 'var(--primary)' }}>{a.icon}</div>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-primary)' }}>{a.label}</div>
                       <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{a.desc}</div>
@@ -99,7 +108,10 @@ export default function Dashboard() {
           <AnimatedContent delay={0.3}>
             <div className="card">
               <div className="card-header">
-                <div className="card-title">👤 Profile Information</div>
+                <div className="card-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <UserIcon size={18} />
+                  Profile Information
+                </div>
                 <motion.button
                   className="btn btn-sm btn-secondary"
                   onClick={() => navigate('/settings')}

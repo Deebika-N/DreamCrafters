@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { ArrowLeft } from 'lucide-react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../../context/AuthContext'
 import api from '../../api'
@@ -74,7 +75,9 @@ export default function StudentLogin() {
           Don't have an account? <Link to="/student/signup">Sign Up</Link>
         </div>
         <div className="auth-footer">
-          <Link to="/">← Back to Home</Link>
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+            <ArrowLeft size={16} /> Back to Home
+          </Link>
         </div>
       </div>
     </div>

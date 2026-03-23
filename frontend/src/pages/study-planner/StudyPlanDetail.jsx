@@ -1,6 +1,14 @@
-import React, { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { 
+  ArrowLeft, 
+  Sparkles, 
+  FileText, 
+  RefreshCw, 
+  Clock, 
+  CheckCircle, 
+  AlertCircle, 
+  Calendar, 
+  Trash2 
+} from 'lucide-react'
 import { studyPlanAPI, studySessionAPI } from '../../api'
 import DashboardLayout from '../../components/DashboardLayout'
 import AnimatedContent from '../../components/reactbits/AnimatedContent'
@@ -53,7 +61,12 @@ export default function StudyPlanDetail() {
     } catch (err) { alert(err.response?.data?.error || 'Failed') }
   }
 
-  const statusIcons = { pending: '⏳', completed: '✅', missed: '❌', rescheduled: '🔄' }
+  const statusIcons = { 
+    pending: <Clock size={18} className="text-muted" />, 
+    completed: <CheckCircle size={18} className="text-success" />, 
+    missed: <AlertCircle size={18} className="text-danger" />, 
+    rescheduled: <RefreshCw size={18} className="text-warning" /> 
+  }
   const priorityLabels = { 1: 'Low', 2: 'Med', 3: 'High' }
   const priorityColors = { 1: 'badge-info', 2: 'badge-warning', 3: 'badge-danger' }
 
@@ -62,7 +75,9 @@ export default function StudyPlanDetail() {
 
   return (
     <DashboardLayout title="Study Plan">
-      <button className="btn btn-ghost" onClick={() => navigate('/study-planner')} style={{ marginBottom: '1rem' }}>← Back to Plans</button>
+      <button className="btn btn-ghost" onClick={() => navigate('/study-planner')} style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+        <ArrowLeft size={16} /> Back to Plans
+      </button>
 
       <div className="card" style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '1rem' }}>
@@ -70,11 +85,15 @@ export default function StudyPlanDetail() {
             <h2 style={{ fontWeight: 800, fontSize: '1.5rem', margin: '0 0 0.5rem' }}>{plan.title}</h2>
             {plan.goal && <p style={{ color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>{plan.goal}</p>}
             <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-              <span className="badge badge-success">{plan.status}</span>
-              <span className="badge badge-info">{plan.generated_by === 'ai' ? '✨ AI Generated' : '📝 Manual'}</span>
+              <span className="badge badge-success" style={{ textTransform: 'capitalize' }}>{plan.status}</span>
+              <span className="badge badge-info" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                {plan.generated_by === 'ai' ? <><Sparkles size={12} /> AI Generated</> : <><FileText size={12} /> Manual</>}
+              </span>
             </div>
           </div>
-          <button className="btn btn-sm btn-secondary" onClick={autoReschedule}>🔄 Auto-Reschedule Missed</button>
+          <button className="btn btn-sm btn-secondary" onClick={autoReschedule} style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <RefreshCw size={14} /> Auto-Reschedule Missed
+          </button>
         </div>
 
         {plan.progress && (
@@ -94,20 +113,20 @@ export default function StudyPlanDetail() {
       <h3 style={{ fontWeight: 700, marginBottom: '1rem' }}>Sessions ({plan.sessions?.length || 0})</h3>
 
       {!plan.sessions || plan.sessions.length === 0 ? (
-        <div className="empty-state"><span className="icon">📋</span><h3>No sessions</h3><p>Add sessions to this plan to start tracking.</p></div>
+        <div className="empty-state"><FileText size={48} color="var(--text-muted)" style={{ marginBottom: '1rem' }} /><h3>No sessions</h3><p>Add sessions to this plan to start tracking.</p></div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
           {plan.sessions.map((s, idx) => (
             <AnimatedContent key={s.id} delay={0} stagger={idx * 0.06}>
             <div className="card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1, minWidth: 0 }}>
-                <span style={{ fontSize: '1.5rem' }}>{statusIcons[s.status] || '⏳'}</span>
+                <span style={{ display: 'flex', alignItems: 'center' }}>{statusIcons[s.status] || <Clock size={18} />}</span>
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{s.title}</div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                    <span>📅 {s.scheduled_date?.split('T')[0]}</span>
-                    {s.scheduled_time && <span>🕐 {s.scheduled_time}</span>}
-                    <span>⏱️ {s.duration_minutes}min</span>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Calendar size={12} /> {s.scheduled_date?.split('T')[0]}</span>
+                    {s.scheduled_time && <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Clock size={12} /> {s.scheduled_time}</span>}
+                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Clock size={12} /> {s.duration_minutes}min</span>
                     <span className={`badge ${priorityColors[s.priority] || 'badge-info'}`}>{priorityLabels[s.priority] || 'Med'}</span>
                   </div>
                 </div>
@@ -115,13 +134,17 @@ export default function StudyPlanDetail() {
               <div style={{ display: 'flex', gap: '0.5rem' }}>
                 {s.status !== 'completed' && (
                   <>
-                    <button className="btn btn-sm btn-success" onClick={() => completeSession(s.id)} disabled={actionLoading === s.id}>
-                      {actionLoading === s.id ? '...' : '✓ Done'}
+                    <button className="btn btn-sm btn-success" onClick={() => completeSession(s.id)} disabled={actionLoading === s.id} style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                      {actionLoading === s.id ? '...' : <><CheckCircle size={14} /> Done</>}
                     </button>
-                    <button className="btn btn-sm btn-secondary" onClick={() => rescheduleSession(s.id)}>📅</button>
+                    <button className="btn btn-sm btn-secondary" onClick={() => rescheduleSession(s.id)} style={{ padding: '4px' }}>
+                      <Calendar size={16} />
+                    </button>
                   </>
                 )}
-                <button className="btn btn-sm btn-ghost" onClick={() => deleteSession(s.id)} style={{ color: 'var(--danger)' }}>🗑️</button>
+                <button className="btn btn-sm btn-ghost" onClick={() => deleteSession(s.id)} style={{ color: 'var(--danger)', padding: '4px' }}>
+                  <Trash2 size={16} />
+                </button>
               </div>
             </div>
             </AnimatedContent>

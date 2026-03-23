@@ -1,6 +1,11 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
+import { 
+  Users, 
+  UserCheck, 
+  FileEdit, 
+  Activity, 
+  Settings, 
+  User 
+} from 'lucide-react'
 import '../student/Dashboard.css'
 
 export default function AdminDashboard() {
@@ -32,25 +37,25 @@ export default function AdminDashboard() {
 
         <div className="stats-grid">
           <div className="stat-card">
-            <div className="stat-icon">👥</div>
+            <div className="stat-icon"><Users size={24} /></div>
             <h3>Total Students</h3>
             <p className="stat-value">0</p>
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">👨‍🏫</div>
+            <div className="stat-icon"><UserCheck size={24} /></div>
             <h3>Total Educators</h3>
             <p className="stat-value">0</p>
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">📝</div>
+            <div className="stat-icon"><FileEdit size={24} /></div>
             <h3>Total Activities</h3>
             <p className="stat-value">0</p>
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">⚡</div>
+            <div className="stat-icon"><Activity size={24} /></div>
             <h3>System Status</h3>
             <p className="stat-value">Active</p>
           </div>
@@ -58,12 +63,12 @@ export default function AdminDashboard() {
 
         <div className="info-section">
           <div className="info-card">
-            <h3>🔧 System Management</h3>
+            <h3><Settings size={20} style={{ marginRight: '0.5rem', verticalAlign: 'middle' }} /> System Management</h3>
             <p className="empty-state">Admin controls and system settings will appear here.</p>
           </div>
 
           <div className="info-card">
-            <h3>👤 Admin Information</h3>
+            <h3><User size={20} style={{ marginRight: '0.5rem', verticalAlign: 'middle' }} /> Admin Information</h3>
             <div className="profile-info">
               <p><strong>Name:</strong> {user?.name}</p>
               <p><strong>Username:</strong> {user?.username}</p>

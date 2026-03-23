@@ -1,7 +1,5 @@
-import React, { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
 import { useAuth } from '../../context/AuthContext'
+import { GraduationCap, UserCheck, ArrowLeft } from 'lucide-react'
 import { studentAuthAPI, educatorAuthAPI } from '../../api'
 import Particles from '../../components/reactbits/Particles'
 
@@ -95,9 +93,15 @@ export default function Register() {
 
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
           <button type="button" className={`btn btn-full ${role === 'student' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => { setRole('student'); setStep(1); setError(''); setMessage('') }}>🎓 Student</button>
+            onClick={() => { setRole('student'); setStep(1); setError(''); setMessage('') }}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+            <GraduationCap size={18} /> Student
+          </button>
           <button type="button" className={`btn btn-full ${role === 'educator' ? 'btn-primary' : 'btn-secondary'}`}
-            onClick={() => { setRole('educator'); setStep(1); setError(''); setMessage('') }}>👨‍🏫 Educator</button>
+            onClick={() => { setRole('educator'); setStep(1); setError(''); setMessage('') }}
+            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+            <UserCheck size={18} /> Educator
+          </button>
         </div>
 
         {step === 1 && (
@@ -167,7 +171,9 @@ export default function Register() {
           Already have an account? <Link to="/login">Sign in</Link>
         </div>
         <div className="auth-footer" style={{ marginTop: '0.75rem' }}>
-          <Link to="/">← Back to Home</Link>
+          <Link to="/" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}>
+            <ArrowLeft size={16} /> Back to Home
+          </Link>
         </div>
       </motion.div>
     </div>

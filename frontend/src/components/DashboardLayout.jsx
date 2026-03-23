@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import Sidebar from './Sidebar'
 import { useAuth } from '../context/AuthContext'
+import { Menu } from 'lucide-react'
 
 export default function DashboardLayout({ children, title }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -15,9 +16,9 @@ export default function DashboardLayout({ children, title }) {
             <button
               className="btn-ghost mobile-menu-btn"
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              style={{ display: 'none', fontSize: '1.5rem', background: 'none', border: 'none', cursor: 'pointer' }}
+              style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', padding: '0.5rem', color: 'var(--text-primary)' }}
             >
-              ☰
+              <Menu size={24} />
             </button>
             <h1 className="top-navbar-title">{title || 'Dashboard'}</h1>
           </div>

@@ -109,4 +109,25 @@ export const webinarAPI = {
   cancelRegistration: (id) => api.delete(`/webinars/${id}/register`),
 }
 
+// ===== Chatbot API (M4 — New) =====
+export const chatbotAPI = {
+  createSession: (data) => api.post('/chat/sessions', data),
+  listSessions: (params) => api.get('/chat/sessions', { params }),
+  getMessages: (id) => api.get(`/chat/sessions/${id}/messages`),
+  sendMessage: (id, data) => api.post(`/chat/sessions/${id}/messages`, data),
+  endSession: (id) => api.patch(`/chat/sessions/${id}/end`),
+  deleteSession: (id) => api.delete(`/chat/sessions/${id}`),
+}
+
+// ===== RAG API (M4 — New) =====
+export const ragAPI = {
+  uploadDocument: (formData) => api.post('/rag/documents', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  listDocuments: () => api.get('/rag/documents'),
+  getDocument: (id) => api.get(`/rag/documents/${id}`),
+  getStatus: (id) => api.get(`/rag/documents/${id}/status`),
+  deleteDocument: (id) => api.delete(`/rag/documents/${id}`),
+}
+
 export default api

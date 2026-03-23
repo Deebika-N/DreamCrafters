@@ -1,4 +1,11 @@
 import React, { useState } from 'react'
+import { 
+  Users, 
+  Search, 
+  MapPin, 
+  Star, 
+  CheckCircle 
+} from 'lucide-react'
 import { dummyMentors } from '../../utils/dummyData'
 import DashboardLayout from '../../components/DashboardLayout'
 import SpotlightCard from '../../components/reactbits/SpotlightCard'
@@ -25,15 +32,27 @@ export default function Mentors() {
   return (
     <DashboardLayout title="Mentors">
       <div className="page-header">
-        <h1>Find a Mentor 👨‍🏫</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          Find a Mentor
+          <Users size={28} color="var(--primary)" />
+        </h1>
         <p>Connect with experienced mentors for personalized guidance
           <span className="badge badge-warning" style={{ marginLeft: '0.75rem' }}>Demo Data</span>
         </p>
       </div>
 
-      <div style={{ marginBottom: '1.5rem' }}>
-        <input className="form-input" placeholder="🔍 Search by name or expertise..." value={search}
-          onChange={e => setSearch(e.target.value)} style={{ maxWidth: '400px' }} />
+      <div style={{ marginBottom: '1.5rem', position: 'relative', maxWidth: '400px' }}>
+        <Search 
+          size={18} 
+          style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} 
+        />
+        <input 
+          className="form-input" 
+          placeholder="Search by name or expertise..." 
+          value={search}
+          onChange={e => setSearch(e.target.value)} 
+          style={{ paddingLeft: '40px' }} 
+        />
       </div>
 
       <div className="grid-2">
@@ -50,9 +69,13 @@ export default function Mentors() {
               </div>
               <div style={{ flex: 1 }}>
                 <h3 style={{ fontWeight: 700, fontSize: '1.1rem', margin: 0 }}>{m.name}</h3>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0.25rem 0' }}>📍 {m.location}</p>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', margin: '0.25rem 0', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <MapPin size={14} /> {m.location}
+                </p>
                 <div style={{ display: 'flex', gap: '1rem', fontSize: '0.85rem', marginTop: '0.5rem' }}>
-                  <span style={{ color: 'var(--warning)', fontWeight: 600 }}>⭐ {m.avg_rating}</span>
+                  <span style={{ color: 'var(--warning)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <Star size={14} fill="var(--warning)" /> {m.avg_rating}
+                  </span>
                   <span style={{ color: 'var(--text-secondary)' }}>{m.completed_sessions} sessions</span>
                 </div>
               </div>
@@ -61,7 +84,9 @@ export default function Mentors() {
               {m.interests.map((int, i) => <span key={i} className="badge badge-info">{int}</span>)}
             </div>
             {requested[m.id] ? (
-              <div className="alert alert-success" style={{ fontSize: '0.85rem' }}>✓ Session requested!</div>
+              <div className="alert alert-success" style={{ fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <CheckCircle size={16} /> Session requested!
+              </div>
             ) : selectedMentor === m.id ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                 <input className="form-input" placeholder="Enter session topic..." value={sessionTopic}

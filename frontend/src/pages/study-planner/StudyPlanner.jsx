@@ -1,6 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { 
+  Calendar, 
+  Sparkles, 
+  FileText, 
+  Trash2, 
+  Plus, 
+  AlertCircle 
+} from 'lucide-react'
 import { studyPlanAPI } from '../../api'
 import DashboardLayout from '../../components/DashboardLayout'
 import SpotlightCard from '../../components/reactbits/SpotlightCard'
@@ -63,17 +71,33 @@ export default function StudyPlanner() {
   return (
     <DashboardLayout title="Study Planner">
       <div className="page-header page-header-actions">
-        <div><h1>Study Planner 📅</h1><p>Plan your study sessions and track progress</p></div>
+        <div>
+          <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            Study Planner
+            <Calendar size={28} color="var(--primary)" />
+          </h1>
+          <p>Plan your study sessions and track progress</p>
+        </div>
         <div style={{ display: 'flex', gap: '0.75rem' }}>
-          <button className="btn btn-secondary" onClick={() => { setShowCreate(true); setShowGenerate(false) }}>+ Manual Plan</button>
-          <button className="btn btn-primary" onClick={() => { setShowGenerate(true); setShowCreate(false) }}>✨ AI Generate</button>
+          <button className="btn btn-secondary" onClick={() => { setShowCreate(true); setShowGenerate(false) }} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Plus size={18} /> Manual Plan
+          </button>
+          <button className="btn btn-primary" onClick={() => { setShowGenerate(true); setShowCreate(false) }} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Sparkles size={18} /> AI Generate
+          </button>
         </div>
       </div>
 
       {(showCreate || showGenerate) && (
         <div className="card" style={{ marginBottom: '2rem' }}>
-          <h3 style={{ marginBottom: '1rem', fontWeight: 700 }}>{showGenerate ? '✨ Generate AI Study Plan' : '📝 Create Study Plan'}</h3>
-          {error && <div className="alert alert-error" style={{ marginBottom: '1rem' }}>{error}</div>}
+          <h3 style={{ marginBottom: '1rem', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            {showGenerate ? <><Sparkles size={20} color="var(--primary)" /> Generate AI Study Plan</> : <><FileText size={20} color="var(--primary)" /> Create Study Plan</>}
+          </h3>
+          {error && (
+            <div className="alert alert-error" style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <AlertCircle size={18} /> {error}
+            </div>
+          )}
           <form onSubmit={showGenerate ? handleGenerate : handleCreate} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '500px' }}>
             {showGenerate ? (
               <>
@@ -108,7 +132,7 @@ export default function StudyPlanner() {
 
       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
         {['', 'active', 'paused', 'completed', 'archived'].map(s => (
-          <button key={s} className={`btn btn-sm ${filter === s ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setFilter(s)}>
+          <button key={s} className={`btn btn-sm ${filter === s ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setFilter(s)} style={{ textTransform: 'capitalize' }}>
             {s || 'All'}
           </button>
         ))}
@@ -118,7 +142,7 @@ export default function StudyPlanner() {
         <div className="empty-state"><div className="loading-spinner" style={{ margin: '0 auto' }} /></div>
       ) : plans.length === 0 ? (
         <div className="empty-state">
-          <span className="icon">📅</span>
+          <Calendar size={48} color="var(--text-muted)" style={{ marginBottom: '1rem' }} />
           <h3>No study plans yet</h3>
           <p>Create your first study plan or let AI generate one for you!</p>
         </div>
@@ -128,8 +152,10 @@ export default function StudyPlanner() {
             <AnimatedContent key={plan.id} delay={0} stagger={idx * 0.08}>
               <SpotlightCard style={{ cursor: 'pointer' }} onClick={() => navigate(`/study-planner/${plan.id}`)}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.75rem' }}>
-                <span className={`badge ${statusColors[plan.status] || 'badge-info'}`}>{plan.status}</span>
-                <span className="badge badge-info">{plan.generated_by === 'ai' ? '✨ AI' : '📝 Manual'}</span>
+                <span className={`badge ${statusColors[plan.status] || 'badge-info'}`} style={{ textTransform: 'capitalize' }}>{plan.status}</span>
+                <span className="badge badge-info" style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  {plan.generated_by === 'ai' ? <><Sparkles size={12} /> AI</> : <><FileText size={12} /> Manual</>}
+                </span>
               </div>
               <h3 style={{ fontWeight: 700, fontSize: '1.05rem', margin: '0 0 0.5rem', lineHeight: 1.4 }}>{plan.title}</h3>
               {plan.goal && <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1rem' }}>{plan.goal}</p>}
@@ -143,8 +169,12 @@ export default function StudyPlanner() {
                 </div>
               )}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                <span>{plan.start_date?.split('T')[0]}</span>
-                <button className="btn btn-ghost btn-sm" onClick={(e) => { e.stopPropagation(); deletePlan(plan.id) }} style={{ color: 'var(--danger)' }}>🗑️</button>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Calendar size={12} /> {plan.start_date?.split('T')[0]}
+                </span>
+                <button className="btn btn-ghost btn-sm" onClick={(e) => { e.stopPropagation(); deletePlan(plan.id) }} style={{ color: 'var(--danger)', padding: '4px' }}>
+                  <Trash2 size={16} />
+                </button>
               </div>
               </SpotlightCard>
             </AnimatedContent>

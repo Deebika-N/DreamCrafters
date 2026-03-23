@@ -1,6 +1,11 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
+import { 
+  Users, 
+  BookOpen, 
+  CheckSquare, 
+  BarChart, 
+  ClipboardList, 
+  Building 
+} from 'lucide-react'
 import './Dashboard.css'
 
 export default function EducatorDashboard() {
@@ -33,25 +38,25 @@ export default function EducatorDashboard() {
 
         <div className="stats-grid">
           <div className="stat-card">
-            <div className="stat-icon">👥</div>
+            <div className="stat-icon"><Users size={24} /></div>
             <h3>Total Students</h3>
             <p className="stat-value">0</p>
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">📝</div>
+            <div className="stat-icon"><BookOpen size={24} /></div>
             <h3>Active Activities</h3>
             <p className="stat-value">0</p>
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">✅</div>
+            <div className="stat-icon"><CheckSquare size={24} /></div>
             <h3>Pending Approvals</h3>
             <p className="stat-value">0</p>
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">📊</div>
+            <div className="stat-icon"><BarChart size={24} /></div>
             <h3>This Month</h3>
             <p className="stat-value">0 pts</p>
           </div>
@@ -59,12 +64,12 @@ export default function EducatorDashboard() {
 
         <div className="info-section">
           <div className="info-card">
-            <h3>📋 Recent Submissions</h3>
+            <h3><ClipboardList size={20} style={{ marginRight: '0.5rem', verticalAlign: 'middle' }} /> Recent Submissions</h3>
             <p className="empty-state">No recent submissions to review.</p>
           </div>
 
           <div className="info-card">
-            <h3>🏢 Organization Information</h3>
+            <h3><Building size={20} style={{ marginRight: '0.5rem', verticalAlign: 'middle' }} /> Organization Information</h3>
             <div className="profile-info">
               <p><strong>Organization:</strong> {user?.organizationName}</p>
               <p><strong>Username:</strong> {user?.username}</p>

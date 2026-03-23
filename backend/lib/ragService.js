@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const pdfParse = require('pdf-parse');
+const { PDFParse } = require('pdf-parse');
 const mammoth = require('mammoth');
 const prisma = require('./prisma');
 const { generateEmbeddings } = require('./embeddingService');
@@ -15,8 +15,13 @@ async function extractText(filePath, mimeType) {
   const buffer = fs.readFileSync(filePath);
 
   if (mimeType === 'application/pdf') {
-    const data = await pdfParse(buffer);
-    return data.text;
+    const parser = new PDFParse({ data: buffer });
+    try {
+      const data = await parser.getText();
+      return data.text;
+    } finally {
+      await parser.destroy();
+    }
   }
 
   if (mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
@@ -64,13 +69,17 @@ function chunkText(text, chunkSize = CHUNK_SIZE, overlap = CHUNK_OVERLAP) {
     }
 
     const chunk = cleaned.substring(start, Math.min(end, cleaned.length)).trim();
-    if (chunk.length > 20) { // skip tiny fragments
+    if (chunk.length > 20) {
       chunks.push(chunk);
     }
 
-    start = Math.min(end, cleaned.length) - overlap;
-    if (start <= chunks.length > 0 ? start : 0) {
-      start = end; // prevent infinite loop
+    const nextStart = Math.min(end, cleaned.length);
+    if (nextStart >= cleaned.length) break;
+
+    // Advance start, ensuring we move forward even with overlap
+    start = nextStart - overlap;
+    if (start >= nextStart) {
+      start = nextStart;
     }
   }
 
@@ -117,7 +126,7 @@ async function processDocument(documentId) {
       const embeddingStr = `[${embeddings[i].join(',')}]`;
       await prisma.$executeRawUnsafe(
         `INSERT INTO rag_chunks (document_id, chunk_index, content, embedding, metadata)
-         VALUES ($1, $2, $3, $4::vector, $5)`,
+         VALUES ($1, $2, $3, $4::vector, $5::jsonb)`,
         documentId,
         i,
         chunks[i],

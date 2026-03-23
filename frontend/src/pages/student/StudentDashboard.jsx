@@ -1,6 +1,11 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useAuth } from '../../context/AuthContext'
+import { 
+  Target, 
+  BookOpen, 
+  Award, 
+  TrendingUp, 
+  Activity, 
+  User 
+} from 'lucide-react'
 import './Dashboard.css'
 
 export default function StudentDashboard() {
@@ -33,25 +38,25 @@ export default function StudentDashboard() {
 
         <div className="stats-grid">
           <div className="stat-card">
-            <div className="stat-icon">🎯</div>
+            <div className="stat-icon"><Target size={24} /></div>
             <h3>Total Points</h3>
             <p className="stat-value">0</p>
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">📚</div>
+            <div className="stat-icon"><BookOpen size={24} /></div>
             <h3>Activities Completed</h3>
             <p className="stat-value">0</p>
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">🏆</div>
+            <div className="stat-icon"><Award size={24} /></div>
             <h3>Achievements</h3>
             <p className="stat-value">0</p>
           </div>
 
           <div className="stat-card">
-            <div className="stat-icon">📈</div>
+            <div className="stat-icon"><TrendingUp size={24} /></div>
             <h3>Current Rank</h3>
             <p className="stat-value">-</p>
           </div>
@@ -59,12 +64,12 @@ export default function StudentDashboard() {
 
         <div className="info-section">
           <div className="info-card">
-            <h3>📋 Recent Activities</h3>
+            <h3><Activity size={20} style={{ marginRight: '0.5rem', verticalAlign: 'middle' }} /> Recent Activities</h3>
             <p className="empty-state">No activities yet. Start participating to earn points!</p>
           </div>
 
           <div className="info-card">
-            <h3>👤 Profile Information</h3>
+            <h3><User size={20} style={{ marginRight: '0.5rem', verticalAlign: 'middle' }} /> Profile Information</h3>
             <div className="profile-info">
               <p><strong>Name:</strong> {user?.name}</p>
               <p><strong>Username:</strong> {user?.username}</p>

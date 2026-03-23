@@ -16,7 +16,7 @@ function getGenAI() {
 
 async function embedWithGemini(texts) {
   const ai = getGenAI();
-  const model = ai.getGenerativeModel({ model: 'text-embedding-004' });
+  const model = ai.getGenerativeModel({ model: 'gemini-embedding-001' });
 
   const embeddings = [];
   // Gemini supports batch embedding — process in batches of 100
@@ -27,6 +27,7 @@ async function embedWithGemini(texts) {
       requests: batch.map(text => ({
         content: { parts: [{ text }] },
         taskType: 'RETRIEVAL_DOCUMENT',
+        outputDimensionality: 768,
       })),
     });
     for (const emb of result.embeddings) {
@@ -38,10 +39,11 @@ async function embedWithGemini(texts) {
 
 async function embedQueryWithGemini(text) {
   const ai = getGenAI();
-  const model = ai.getGenerativeModel({ model: 'text-embedding-004' });
+  const model = ai.getGenerativeModel({ model: 'gemini-embedding-001' });
   const result = await model.embedContent({
     content: { parts: [{ text }] },
     taskType: 'RETRIEVAL_QUERY',
+    outputDimensionality: 768,
   });
   return result.embedding.values;
 }
@@ -72,6 +74,34 @@ async function embedQueryWithOllama(text) {
   return results[0];
 }
 
+// ─── Local Transformers (Hugging Face) ────────────────────
+let extractor;
+async function getTransformerPipeline() {
+  if (!extractor) {
+    const { pipeline } = await import('@xenova/transformers');
+    // Using 768-dimension model to match existing database schema
+    const model = process.env.TRANSFORMERS_EMBED_MODEL || 'Xenova/all-mpnet-base-v2';
+    console.log(`[Embeddings] Loading local model: ${model}...`);
+    extractor = await pipeline('feature-extraction', model);
+  }
+  return extractor;
+}
+
+async function embedWithTransformers(texts) {
+  const generateEmbedding = await getTransformerPipeline();
+  const embeddings = [];
+  for (const text of texts) {
+    const output = await generateEmbedding(text, { pooling: 'mean', normalize: true });
+    embeddings.push(Array.from(output.data));
+  }
+  return embeddings;
+}
+
+async function embedQueryWithTransformers(text) {
+  const results = await embedWithTransformers([text]);
+  return results[0];
+}
+
 // ─── Public API ───────────────────────────────────────────
 
 /**
@@ -82,10 +112,15 @@ async function embedQueryWithOllama(text) {
 async function generateEmbeddings(texts) {
   if (texts.length === 0) return [];
 
-  if (EMBEDDING_PROVIDER === 'ollama') {
-    return embedWithOllama(texts);
+  switch (EMBEDDING_PROVIDER) {
+    case 'ollama':
+      return embedWithOllama(texts);
+    case 'transformers':
+      return embedWithTransformers(texts);
+    case 'gemini':
+    default:
+      return embedWithGemini(texts);
   }
-  return embedWithGemini(texts);
 }
 
 /**
@@ -94,10 +129,15 @@ async function generateEmbeddings(texts) {
  * @returns {Promise<number[]>} - Single embedding vector
  */
 async function generateQueryEmbedding(text) {
-  if (EMBEDDING_PROVIDER === 'ollama') {
-    return embedQueryWithOllama(text);
+  switch (EMBEDDING_PROVIDER) {
+    case 'ollama':
+      return embedQueryWithOllama(text);
+    case 'transformers':
+      return embedQueryWithTransformers(text);
+    case 'gemini':
+    default:
+      return embedQueryWithGemini(text);
   }
-  return embedQueryWithGemini(text);
 }
 
 module.exports = {

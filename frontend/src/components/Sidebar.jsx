@@ -1,24 +1,36 @@
 import React from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { 
+  LayoutDashboard, 
+  Calendar, 
+  Library, 
+  Target, 
+  Video, 
+  MessageSquare, 
+  Users, 
+  Briefcase, 
+  Settings, 
+  LogOut 
+} from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import GradientText from './reactbits/GradientText'
 
 const navItems = [
   { section: 'Main', items: [
-    { path: '/dashboard', icon: '🏠', label: 'Dashboard' },
-    { path: '/study-planner', icon: '📅', label: 'Study Planner' },
+    { path: '/dashboard', icon: <LayoutDashboard size={18} />, label: 'Dashboard' },
+    { path: '/study-planner', icon: <Calendar size={18} />, label: 'Study Planner' },
   ]},
   { section: 'Learn', items: [
-    { path: '/content', icon: '📚', label: 'Content Library' },
-    { path: '/careers', icon: '🎯', label: 'Career Paths' },
-    { path: '/webinars', icon: '🎥', label: 'Webinars' },
+    { path: '/content', icon: <Library size={18} />, label: 'Content Library' },
+    { path: '/careers', icon: <Target size={18} />, label: 'Career Paths' },
+    { path: '/webinars', icon: <Video size={18} />, label: 'Webinars' },
   ]},
   { section: 'Connect', items: [
-    { path: '/chat', icon: '💬', label: 'AI Chatbot' },
-    { path: '/mentors', icon: '👨‍🏫', label: 'Mentors' },
+    { path: '/chat', icon: <MessageSquare size={18} />, label: 'AI Chatbot' },
+    { path: '/mentors', icon: <Users size={18} />, label: 'Mentors' },
   ]},
   { section: 'Opportunities', items: [
-    { path: '/jobs', icon: '💼', label: 'Job Board' },
+    { path: '/jobs', icon: <Briefcase size={18} />, label: 'Job Board' },
   ]},
 ]
 
@@ -83,11 +95,11 @@ export default function Sidebar({ isOpen, onClose }) {
             className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}
             onClick={onClose}
           >
-            <span className="icon">⚙️</span>
+            <span className="icon"><Settings size={18} /></span>
             Settings
           </NavLink>
           <button className="sidebar-link" onClick={handleLogout}>
-            <span className="icon">🚪</span>
+            <span className="icon"><LogOut size={18} /></span>
             Logout
           </button>
         </nav>

@@ -1,4 +1,12 @@
 import React, { useState } from 'react'
+import { 
+  Briefcase, 
+  Search, 
+  MapPin, 
+  DollarSign, 
+  Calendar, 
+  CheckCircle 
+} from 'lucide-react'
 import { dummyJobs } from '../../utils/dummyData'
 import DashboardLayout from '../../components/DashboardLayout'
 import SpotlightCard from '../../components/reactbits/SpotlightCard'
@@ -26,7 +34,10 @@ export default function JobBoard() {
   return (
     <DashboardLayout title="Job Board">
       <div className="page-header">
-        <h1>Job Board 💼</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          Job Board
+          <Briefcase size={28} color="var(--primary)" />
+        </h1>
         <p>Discover internships and jobs matched to your skills
           <span className="badge badge-warning" style={{ marginLeft: '0.75rem' }}>Demo Data</span>
         </p>
@@ -34,8 +45,19 @@ export default function JobBoard() {
 
       <div className="card" style={{ marginBottom: '2rem' }}>
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-          <input className="form-input" placeholder="🔍 Search jobs or companies..." value={search}
-            onChange={e => setSearch(e.target.value)} style={{ flex: 2, minWidth: '200px' }} />
+          <div style={{ flex: 2, minWidth: '200px', position: 'relative' }}>
+            <Search 
+              size={18} 
+              style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} 
+            />
+            <input 
+              className="form-input" 
+              placeholder="Search jobs or companies..." 
+              value={search}
+              onChange={e => setSearch(e.target.value)} 
+              style={{ paddingLeft: '40px', width: '100%' }} 
+            />
+          </div>
           <select className="form-select" value={typeFilter} onChange={e => setTypeFilter(e.target.value)} style={{ minWidth: '150px' }}>
             <option value="">All Types</option>
             <option value="full-time">Full-time</option>
@@ -58,7 +80,9 @@ export default function JobBoard() {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
                   <span className={`badge ${typeColors[job.job_type] || 'badge-info'}`}>{job.job_type}</span>
-                  <span className="badge" style={{ background: 'var(--bg-input)' }}>📍 {job.location}</span>
+                  <span className="badge" style={{ background: 'var(--bg-input)', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <MapPin size={12} /> {job.location}
+                  </span>
                 </div>
                 <h3 style={{ fontWeight: 700, fontSize: '1.1rem', margin: '0 0 0.25rem' }}>{job.title}</h3>
                 <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', margin: '0 0 0.5rem' }}>{job.company}</p>
@@ -66,14 +90,20 @@ export default function JobBoard() {
                 <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', margin: '0.75rem 0' }}>
                   {job.required_skills.map((sk, i) => <span key={i} className="badge badge-primary">{sk}</span>)}
                 </div>
-                <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                  <span>💰 {job.salary_range}</span>
-                  <span>📅 Deadline: {job.application_deadline}</span>
+                <div style={{ display: 'flex', gap: '1.5rem', fontSize: '0.85rem', color: 'var(--text-muted)', flexWrap: 'wrap' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <DollarSign size={14} /> {job.salary_range}
+                  </span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                    <Calendar size={14} /> Deadline: {job.application_deadline}
+                  </span>
                 </div>
               </div>
               <div>
                 {applied[job.id] ? (
-                  <span className="badge badge-success" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>✓ Applied</span>
+                  <span className="badge badge-success" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <CheckCircle size={14} /> Applied
+                  </span>
                 ) : (
                   <button className="btn btn-primary btn-sm" onClick={() => applyJob(job.id)}>
                     Apply Now

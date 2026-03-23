@@ -164,6 +164,35 @@ exports.sendMessage = async (req, res) => {
       });
     }
 
+    // Dynamic RAG: Update linked documents if provided in the body
+    const { document_ids } = req.body;
+    if (Array.isArray(document_ids)) {
+      // Clear existing links and add new ones
+      await prisma.chatSessionDocument.deleteMany({
+        where: { sessionId }
+      });
+      
+      if (document_ids.length > 0) {
+        const links = document_ids.map(docId => ({
+          sessionId,
+          documentId: parseInt(docId, 10),
+        }));
+        await prisma.chatSessionDocument.createMany({
+          data: links,
+          skipDuplicates: true,
+        });
+
+        // Ensure session type is 'rag' if docs are attached
+        if (session.sessionType !== 'rag') {
+          await prisma.chatSession.update({
+            where: { id: sessionId },
+            data: { sessionType: 'rag' }
+          });
+          session.sessionType = 'rag';
+        }
+      }
+    }
+
     // Save user message
     const userMsg = await prisma.chatMessage.create({
       data: {

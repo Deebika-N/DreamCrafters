@@ -1,4 +1,11 @@
 import React, { useState, useEffect } from 'react'
+import { 
+  Video, 
+  AlertCircle, 
+  Users, 
+  Calendar, 
+  Clock 
+} from 'lucide-react'
 import { webinarAPI } from '../../api'
 import DashboardLayout from '../../components/DashboardLayout'
 import SpotlightCard from '../../components/reactbits/SpotlightCard'
@@ -47,15 +54,26 @@ export default function Webinars() {
   return (
     <DashboardLayout title="Webinars">
       <div className="page-header">
-        <h1>Webinars 🎥</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          Webinars
+          <Video size={28} color="var(--primary)" />
+        </h1>
         <p>Join live sessions hosted by industry experts and mentors</p>
       </div>
 
       {loading && <div className="empty-state"><div className="loading-spinner" style={{ margin: '0 auto' }} /></div>}
-      {error && !loading && <div className="alert alert-error">❌ {error}</div>}
+      {error && !loading && (
+        <div className="alert alert-error" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <AlertCircle size={18} /> {error}
+        </div>
+      )}
 
       {!loading && !error && (!Array.isArray(webinars) || webinars.length === 0) && (
-        <div className="empty-state"><span className="icon">🎥</span><h3>No webinars available</h3><p>New webinars will appear here once scheduled.</p></div>
+        <div className="empty-state">
+          <Video size={48} color="var(--text-muted)" style={{ marginBottom: '1rem' }} />
+          <h3>No webinars available</h3>
+          <p>New webinars will appear here once scheduled.</p>
+        </div>
       )}
 
       {!loading && !error && Array.isArray(webinars) && webinars.length > 0 && (
@@ -67,16 +85,32 @@ export default function Webinars() {
                 height: '100px', borderRadius: 'var(--radius-md)',
                 background: 'linear-gradient(135deg, rgba(102,126,234,0.15), rgba(118,75,162,0.2))',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '2.5rem', marginBottom: '1rem'
-              }}>🎥</div>
+                marginBottom: '1rem', color: 'var(--primary)'
+              }}>
+                <Video size={40} />
+              </div>
               {w.topic && <span className="badge badge-primary" style={{ marginBottom: '0.5rem' }}>{w.topic}</span>}
               <h3 style={{ fontWeight: 700, fontSize: '1.05rem', margin: '0.5rem 0' }}>{w.title}</h3>
               {w.description && <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1rem', lineHeight: 1.5 }}>{w.description}</p>}
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.85rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
-                {w.host_name && <span>👨‍🏫 {w.host_name}</span>}
-                <span>📅 {new Date(w.scheduled_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
-                {w.duration_minutes && <span>⏱️ {w.duration_minutes} minutes</span>}
-                {w.max_participants && <span>👥 {w.registered_count || 0}/{w.max_participants} registered</span>}
+                {w.host_name && (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <Users size={14} /> {w.host_name}
+                  </span>
+                )}
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <Calendar size={14} /> {new Date(w.scheduled_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                </span>
+                {w.duration_minutes && (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <Clock size={14} /> {w.duration_minutes} minutes
+                  </span>
+                )}
+                {w.max_participants && (
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <Users size={14} /> {w.registered_count || 0}/{w.max_participants} registered
+                  </span>
+                )}
               </div>
               {w.max_participants && (
                 <div style={{ marginBottom: '1rem' }}>
