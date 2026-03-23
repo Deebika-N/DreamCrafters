@@ -7,6 +7,7 @@ import {
   Clock 
 } from 'lucide-react'
 import { webinarAPI } from '../../api'
+import { normalizeWebinar } from '../../utils/m2normalize'
 import DashboardLayout from '../../components/DashboardLayout'
 import SpotlightCard from '../../components/reactbits/SpotlightCard'
 import AnimatedContent from '../../components/reactbits/AnimatedContent'
@@ -23,9 +24,20 @@ export default function Webinars() {
     setLoading(true)
     setError(null)
     try {
-      const res = await webinarAPI.getAll()
-      const data = res.data
-      setWebinars(data.data || data.webinars || data || [])
+      const [listRes, mineRes] = await Promise.all([
+        webinarAPI.getAll(),
+        webinarAPI.getMyRegistrations().catch(() => ({ data: { data: [] } })),
+      ])
+      const list = listRes.data?.data || listRes.data?.webinars || []
+      const mine = mineRes.data?.data || []
+      const mineIds = new Set(mine.map((w) => w.id))
+      const arr = Array.isArray(list) ? list : []
+      setWebinars(
+        arr.map((w) => ({
+          ...normalizeWebinar(w),
+          isRegistered: mineIds.has(w.id),
+        }))
+      )
     } catch (err) {
       console.error('Error fetching webinars:', err)
       setError(err.response?.data?.error || err.message)
@@ -99,12 +111,14 @@ export default function Webinars() {
                   </span>
                 )}
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <Calendar size={14} /> {new Date(w.scheduled_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  <Calendar size={14} /> {new Date(w.scheduled_at || w.scheduledAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
                 </span>
-                {w.duration_minutes && (
+                {(w.duration_minutes != null || w.durationMinutes != null) && (
+                  (
                   <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                    <Clock size={14} /> {w.duration_minutes} minutes
+                    <Clock size={14} /> {(w.duration_minutes ?? w.durationMinutes)} minutes
                   </span>
+                )
                 )}
                 {w.max_participants && (
                   <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
@@ -124,9 +138,12 @@ export default function Webinars() {
                   Cancel Registration
                 </button>
               ) : (
-                <button className="btn btn-primary btn-full btn-sm" onClick={() => registerWebinar(w.id)}
-                  disabled={registering === w.id}>
-                  {registering === w.id ? 'Registering...' : 'Register Now'}
+                <button
+                  className="btn btn-primary btn-full btn-sm"
+                  onClick={() => registerWebinar(w.id)}
+                  disabled={registering === w.id || w.is_full}
+                >
+                  {registering === w.id ? 'Registering...' : w.is_full ? 'Full' : 'Register Now'}
                 </button>
               )}
             </SpotlightCard>

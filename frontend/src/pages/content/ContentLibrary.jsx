@@ -19,6 +19,7 @@ import {
   CheckCircle 
 } from 'lucide-react'
 import { contentAPI } from '../../api'
+import { normalizeContentItem } from '../../utils/m2normalize'
 import DashboardLayout from '../../components/DashboardLayout'
 import SpotlightCard from '../../components/reactbits/SpotlightCard'
 import AnimatedContent from '../../components/reactbits/AnimatedContent'
@@ -58,8 +59,24 @@ export default function ContentLibrary() {
         if (search) params.search = search
         response = await contentAPI.getAll(params)
       }
-      const data = response.data
-      setContent(data.data || data.content || data || [])
+      const payload = response.data
+      let raw = payload.data || payload.content || []
+      if (!Array.isArray(raw)) raw = []
+
+      if (view === 'bookmarks') {
+        raw = raw.map((c) => ({ ...c, isBookmarked: true }))
+      } else {
+        try {
+          const bmRes = await contentAPI.getBookmarks()
+          const bookmarked = bmRes.data?.data || []
+          const ids = new Set(bookmarked.map((x) => x.id))
+          raw = raw.map((c) => ({ ...c, isBookmarked: ids.has(c.id) }))
+        } catch {
+          raw = raw.map((c) => ({ ...c, isBookmarked: false }))
+        }
+      }
+
+      setContent(raw.map(normalizeContentItem))
     } catch (err) {
       console.error('Error fetching content:', err)
       if (err.response?.status === 401 && (view === 'recommended' || view === 'bookmarks')) {

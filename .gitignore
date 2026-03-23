@@ -141,3 +141,7 @@ vite.config.ts.timestamp-*
 # Prisma
 prisma/*.db
 prisma/*.db-journal
+
+# Local-only dev utilities (optional seed / DB reset — keep on your machine, not in repo)
+backend/prisma/seed.js
+backend/scripts/truncate-all-data.sql

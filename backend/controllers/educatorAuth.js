@@ -24,6 +24,7 @@ const setAuthCookie = (res, token) => {
 
 const sanitizeEducator = (user) => ({
   id: user.id,
+  name: user.name,
   organizationName: user.name,
   username: user.username,
   email: user.email,
@@ -231,6 +232,7 @@ exports.getEducatorProfile = async (req, res) => {
       success: true,
       user: {
         id: educator.id,
+        name: educator.name,
         organizationName: educator.name,
         username: educator.username,
         email: educator.email,

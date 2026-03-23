@@ -24,7 +24,7 @@ export default function DashboardLayout({ children, title }) {
           </div>
           <div className="top-navbar-actions">
             <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-              Welcome, <strong>{user?.name}</strong>
+              Welcome, <strong>{user?.name || user?.organizationName}</strong>
             </span>
           </div>
         </nav>

@@ -60,7 +60,7 @@ export default function Dashboard() {
         transition={{ duration: 0.5 }}
       >
         <div className="page-header">
-          <h1>Welcome back, {user?.name?.split(' ')[0]}!</h1>
+          <h1>Welcome back, {(user?.name || user?.organizationName || 'there').split(' ')[0]}!</h1>
           <p>Here's your learning overview</p>
         </div>
 

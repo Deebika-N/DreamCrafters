@@ -61,12 +61,23 @@ export default function Register() {
     setLoading(true)
     setError('')
     try {
-      const res = await authAPI.completeSignup({
-        email, otp,
-        name: formData.name,
-        username: formData.username,
-        password: formData.password
-      })
+      const payload =
+        role === 'educator'
+          ? {
+              email,
+              otp,
+              organizationName: formData.name,
+              username: formData.username,
+              password: formData.password,
+            }
+          : {
+              email,
+              otp,
+              name: formData.name,
+              username: formData.username,
+              password: formData.password,
+            }
+      const res = await authAPI.completeSignup(payload)
       if (res.data.success) {
         login(res.data.user)
         navigate('/dashboard')
@@ -141,9 +152,9 @@ export default function Register() {
         {step === 3 && (
           <form onSubmit={handleDetailsSubmit} className="auth-form">
             <div className="form-group">
-              <label className="form-label">Full Name</label>
+              <label className="form-label">{role === 'educator' ? 'Organization name' : 'Full Name'}</label>
               <input type="text" className="form-input" value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})} placeholder="Enter your full name" required />
+                onChange={(e) => setFormData({...formData, name: e.target.value})} placeholder={role === 'educator' ? 'Your organization or institution' : 'Enter your full name'} required />
             </div>
             <div className="form-group">
               <label className="form-label">Username</label>

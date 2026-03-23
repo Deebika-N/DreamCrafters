@@ -55,7 +55,7 @@ export default function Settings() {
           <User size={20} color="var(--primary)" /> Profile Information
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
-          <div><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Name</span><br /><strong>{user?.name}</strong></div>
+          <div><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>{user?.role === 'educator' ? 'Organization' : 'Name'}</span><br /><strong>{user?.name || user?.organizationName}</strong></div>
           <div><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Username</span><br /><strong>{user?.username}</strong></div>
           <div><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Email</span><br /><strong>{user?.email}</strong></div>
           <div><span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Role</span><br /><span className="badge badge-primary" style={{ textTransform: 'capitalize' }}>{user?.role}</span></div>

@@ -43,8 +43,9 @@ export default function Sidebar({ isOpen, onClose }) {
     navigate('/')
   }
 
-  const initials = user?.name
-    ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+  const displayName = user?.name || user?.organizationName || ''
+  const initials = displayName
+    ? displayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
     : '?'
 
   return (
@@ -107,7 +108,7 @@ export default function Sidebar({ isOpen, onClose }) {
         <div className="sidebar-user">
           <div className="sidebar-avatar">{initials}</div>
           <div className="sidebar-user-info">
-            <div className="sidebar-user-name">{user?.name || 'User'}</div>
+            <div className="sidebar-user-name">{displayName || 'User'}</div>
             <div className="sidebar-user-role">{user?.role || 'student'}</div>
           </div>
         </div>

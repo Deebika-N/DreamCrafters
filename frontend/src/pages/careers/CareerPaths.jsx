@@ -9,6 +9,7 @@ import {
   X 
 } from 'lucide-react'
 import { careerAPI } from '../../api'
+import { normalizeCareerPath } from '../../utils/m2normalize'
 import DashboardLayout from '../../components/DashboardLayout'
 import SpotlightCard from '../../components/reactbits/SpotlightCard'
 import AnimatedContent from '../../components/reactbits/AnimatedContent'
@@ -41,7 +42,8 @@ export default function CareerPaths() {
     try {
       const res = await careerAPI.getOne(id)
       const data = res.data
-      setSelectedPath(data.data || data.careerPath || data)
+      const raw = data.data || data.careerPath || data
+      setSelectedPath(normalizeCareerPath(raw))
     } catch (err) {
       console.error('Error:', err)
     }
